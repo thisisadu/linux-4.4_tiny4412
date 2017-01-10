@@ -247,6 +247,16 @@ config SERIAL_SAMSUNG
 	  provide all of these ports, depending on how the serial port
 	  pins are configured.
 
+config SERIAL_MY_SAMSUNG
+	tristate "Samsung SoC serial support"
+	depends on PLAT_SAMSUNG || ARCH_EXYNOS
+	select SERIAL_CORE
+	help
+	  Support for the on-chip UARTs on the Samsung S3C24XX series CPUs,
+	  providing /dev/ttySAC0, 1 and 2 (note, some machines may not
+	  provide all of these ports, depending on how the serial port
+	  pins are configured.
+
 config SERIAL_SAMSUNG_UARTS_4
 	bool
 	depends on SERIAL_SAMSUNG
