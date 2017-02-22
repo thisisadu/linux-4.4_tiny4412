@@ -23,8 +23,8 @@
 	compatible = "friendlyarm,tiny4412", "samsung,exynos4412", "samsung,exynos4";
 
 	chosen {
-		stdout-path = &serial_0;
-		bootargs = "root=/dev/ram0 rw rootfstype=ext4 console=ttySAC0,115200 ethmac=1C:6F:65:34:51:7E init=/linuxrc";
+		stdout-path = &serial_1;
+		bootargs = "root=/dev/mmcblk1p2 rw rootwait rootfstype=ext3 console=ttySAC0,115200 ethmac=1C:6F:65:34:51:7E init=/linuxrc";
 	};
 
 	aliases {
@@ -66,6 +66,12 @@
 			linux,default-trigger = "mmc0";
 		};
 	};
+
+  interrupt_demo:interrupt_demo{
+      compatible = "tiny4412,interrupt_demo";
+      interrupts = <2 0>,<4 0>;
+      interrupt-parent = <&gpx3>;
+  };
 
 	fixed-rate-clocks {
 		xxti {
@@ -177,18 +183,12 @@
 };
 
 &serial_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_data &uart1_fctl>;
 	status = "okay";
 };
 
 &serial_1 {
-	status = "okay";
-};
-
-&serial_2 {
-	status = "okay";
-};
-
-&serial_3 {
 	status = "okay";
 };
 
