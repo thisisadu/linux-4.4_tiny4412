@@ -67,11 +67,33 @@
 		};
 	};
 
+led_pin {
+    compatible         = "tiny4412,led_demo";
+    pinctrl-names = "led_demo";
+    pinctrl-0 = <&led_demo>;
+    tiny4412,int_gpio1 = <&gpm4 0 GPIO_ACTIVE_HIGH>;
+    tiny4412,int_gpio2 = <&gpm4 1 GPIO_ACTIVE_HIGH>;
+    tiny4412,int_gpio3 = <&gpm4 2 GPIO_ACTIVE_HIGH>;
+    tiny4412,int_gpio4 = <&gpm4 3 GPIO_ACTIVE_HIGH>;
+};
+
   interrupt_demo:interrupt_demo{
       compatible = "tiny4412,interrupt_demo";
       interrupts = <2 0>,<4 0>;
       interrupt-parent = <&gpx3>;
   };
+
+backlight_demo@139D0000{
+                compatible         = "tiny4412,backlight_demo";
+                reg = <0x139D0000  0x14>;
+                tiny4412,backlight = <&gpx1 2 GPIO_ACTIVE_HIGH>;
+                pinctrl-names = "backlight_out","backlight_in";
+                pinctrl-0 = <&backlight_out>;
+                pinctrl-1 = <&backlight_in>;
+                interrupts = <0 40 0>;
+                clocks = <&clock CLK_PWM>;
+                clock-names = "timers";
+        };
 
 	fixed-rate-clocks {
 		xxti {
@@ -105,18 +127,6 @@
 		};
 	};
 
-	bl: backlight {
-		   compatible = "pwm-backlight";
-		   pwms = <&pwm 0 1000000000 PWM_POLARITY_NORMAL>;
-		   pwm-names = "backlight";
-		   brightness-levels = <0 1 2 3 4 5 6 7 8 9 10>;
-		   default-brightness-level = <3>;
-#if 0
-		   pinctrl-0 = <&pwm0_out>;
-		   pinctrl-names = "default";
-#endif
-                   status = "disabled";
-	};
 
 #ifdef CONFIG_MMA7660_USE_I2C_GPIO
 	i2c_mma7660: i2c-gpio-0 {
@@ -142,6 +152,30 @@
 		};
 	};
 #endif
+};
+
+&pinctrl_1 {
+        led_demo: led{
+                samsung,pins = "gpm4-0", "gpm4-1" ,"gpm4-2", "gpm4-3";
+                samsung,pin-function = <0x1>;  
+                samsung,pin-pud = <0x0>;      
+                samsung,pin-drv = <0x0>;     
+        };
+}; 
+
+&pinctrl_1 {
+        backlight_out: backlight_out{
+                samsung,pins = "gpx1-2";
+                samsung,pin-function = <1>;
+                samsung,pin-pud = <0>;
+                samsung,pin-drv = <0>;
+        };
+         backlight_in: backlight_in{
+                samsung,pins = "gpx1-2";
+                samsung,pin-function = <0>;
+                samsung,pin-pud = <0>;
+                samsung,pin-drv = <0>;
+        };
 };
 
 &rtc {
@@ -173,13 +207,6 @@
 	status = "okay";
 	bus-width = <8>;
 	cap-mmc-highspeed;
-};
-
-&pwm {
-	pinctrl-0 = <&pwm0_out>;
-	pinctrl-names = "default";
-	samsung,pwm-outputs = <0>;
-	status = "okay";
 };
 
 &serial_0 {
