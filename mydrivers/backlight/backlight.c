@@ -77,7 +77,6 @@ static inline void stop_timer_for_1wire(void)
     tcon = timer->TCON;
     tcon &= ~(1 << 16);
     timer->TCON = tcon;
-    printk("stop_timer_for_1wire\n");
 }
 
 static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
@@ -86,7 +85,7 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
     tint = timer->TINT_CSTAT;
     tint |= 0x100;
     timer->TINT_CSTAT = tint;
-    printk("timer_for_1wire_interrupt\n");
+    //printk("timer_for_1wire_interrupt\n");
     io_bit_count--;
 
     switch (one_wire_status)
@@ -97,7 +96,6 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
             {
                 io_bit_count = 16;
                 one_wire_status = REQUEST;
-                printk("change to request\n");
             }
 
             break;
@@ -109,7 +107,6 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
             {
                 io_bit_count = 2;
                 one_wire_status = WAITING;
-                printk("change to waiting\n");
             }
 
             break;
@@ -119,14 +116,12 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
             {
                 io_bit_count = 32;
                 one_wire_status = RESPONSE;
-                printk("change to response\n");
             }
 
             if (io_bit_count == 1)
             {
                 pinctrl_select_state(pctrl, pstate_in);
                 gpio_set_value(one_write_pin, 1);
-                printk("change to state in\n");
             }
 
             break;
@@ -140,7 +135,6 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
                 gpio_set_value(one_write_pin, 1);
                 pinctrl_select_state(pctrl, pstate_out);
                 //one_wire_session_complete(one_wire_request, io_data);
-                printk("change to stoping\n");
             }
 
             break;
@@ -150,7 +144,6 @@ static irqreturn_t timer_for_1wire_interrupt(int irq, void *dev_id)
             {
                 one_wire_status = IDLE;
                 stop_timer_for_1wire();
-                printk("change to idle\n");
             }
 
             break;
@@ -204,7 +197,7 @@ static const unsigned char crc8_tab[] =
 static void start_one_wire_session(unsigned char req)
 {
     unsigned int tcon;
-    printk("backlight_write %d\n",req);
+    printk("backlight_write\n");
     one_wire_status = START;
     gpio_set_value(one_write_pin, 1);
     pinctrl_select_state(pctrl, pstate_out);
@@ -356,7 +349,7 @@ static int backlight_probe(struct platform_device *pdev)
         return -EINVAL;
     }
 
-    start_one_wire_session(0x60);
+    start_one_wire_session(100+0x80);
 
     if (alloc_chrdev_region(&devid, 0, 1, "backlight") < 0)
     {

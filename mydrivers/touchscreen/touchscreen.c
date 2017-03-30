@@ -50,7 +50,7 @@ static void touch_read(uchar addr,uchar *buf,unsigned int len)
   }
 }
 
-static void touch_read_handler(struct work_struct *work);
+static void touch_read_handler(struct work_struct *work)
 {
   uchar buf[13];
   uchar touches,i,event,id;
@@ -95,7 +95,7 @@ static irqreturn_t touch_isr(int irq,void *dev_id)
   return IRQ_HANDLED;
 }
 
-static int touch_probe(struct platform_device *pdev)
+static int touch_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
   uchar buf;
   int ret;
@@ -142,7 +142,7 @@ static int touch_probe(struct platform_device *pdev)
   return 0;
 }
 
-static int touch_remove(struct platform_device *pdev)
+static int touch_remove(struct i2c_client *client)
 {
   printk("%s enter.\n",__func__);
   return 0;
@@ -185,7 +185,7 @@ static const struct of_device_id touch_dt_ids[] =
 };
 MODULE_DEVICE_TABLE(of, touch_dt_ids);
 
-static struct platform_driver touch_driver =
+static struct platform_driver touch_demo_driver =
 {
     .driver        = {
         .name      = "touch_demo",
@@ -199,7 +199,7 @@ static int touch_init(void)
 {
     int ret;
     printk("enter %s\n", __func__);
-    ret = platform_driver_register(&touch_driver);
+    ret = platform_driver_register(&touch_demo_driver);
     if (ret)
     {
         printk(KERN_ERR "touch demo: probe faid touch: %d\n", ret);
@@ -214,7 +214,7 @@ static void touch_exit(void)
 {
     printk("enter %s\n", __func__);
     i2c_del_driver(&touch_driver);
-    platform_driver_unregister(&touch_driver);
+    platform_driver_unregister(&touch_demo_driver);
 }
 
 module_init(touch_init);

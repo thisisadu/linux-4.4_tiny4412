@@ -83,6 +83,12 @@ led_pin {
       interrupt-parent = <&gpx3>;
   };
 
+touch_demo{
+    compatible = "tiny4412,touch_demo";
+    interrupts = <6 0>;
+        interrupt-parent = <&gpx1>;
+        status = "okay";
+};
 backlight_demo@139D0000{
                 compatible         = "tiny4412,backlight_demo";
                 reg = <0x139D0000  0x14>;
@@ -94,6 +100,19 @@ backlight_demo@139D0000{
                 clocks = <&clock CLK_PWM>;
                 clock-names = "timers";
         };
+
+#if 0
+pwm_demo@139D0000{
+    compatible         = "tiny4412,pwm_demo";
+    reg = <0x139D0000  0x14>;
+    pinctrl-names = "default";
+    //这里可以设置为pinctrl-names = "default";代码中就免去 devm_pinctrl_get ...等等操作了
+    pinctrl-0 = <&pwm0_out>;
+    clocks = <&clock CLK_PWM>;
+    //PWM ADC 等等模块都需要使能时钟模块才能工作,CLK_PWM定义在Exynos4.h (include\dt-bindings\clock) 
+    clock-names = "timers";
+};
+#endif
 
 	fixed-rate-clocks {
 		xxti {
@@ -178,6 +197,7 @@ backlight_demo@139D0000{
         };
 };
 
+
 &rtc {
 	status = "okay";
 };
@@ -246,7 +266,13 @@ backlight_demo@139D0000{
 &hsotg {
 	status = "okay";
 };
-
+&i2c_1{
+        status = "okay";
+        touch@38{
+                compatible = "tiny4412,touch";
+                reg = <0x38>;
+        };
+};
 #ifndef CONFIG_MMA7660_USE_I2C_GPIO
 /* MMA7660FC  */
 &i2c_3 {
